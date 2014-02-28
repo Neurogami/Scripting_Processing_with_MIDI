@@ -1,0 +1,4 @@
+devices:["QuNexus", "01. Internal MIDI", "Launchpad"]
+# The assumption is that you will use one or the other to fill the "grid" role. 
+device_mappings: {"Launchpad": "grid", "QuNexus": "grid" }
+alternateGridChannel: 3
