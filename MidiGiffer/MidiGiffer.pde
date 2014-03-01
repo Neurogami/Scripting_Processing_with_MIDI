@@ -21,82 +21,41 @@ String[] gifFiles = {
   "GIFs/animated-greytone001_600-1800.20_jpg.gif", 
   "GIFs/animated-greytone001_600-3100.20_gif.gif", 
   "GIFs/animated-greytone001_600-4000.20_gif.gif", 
+  "GIFs/scroller_001.gif",
   "GIFs/animated-greytone001_600-900.20_jpg.gif", 
   "GIFs/animated-greytone001_600_magenta-1700.20_jpg.gif", 
   "GIFs/animated-greytone001_600_magenta-4400.20_jpg.gif",
+  "GIFs/scroller_001.gif",
 
   "GIFs/rot45_animated-greytone001_600-1300.20_jpg.gif", 
   "GIFs/rot45_animated-greytone001_600-1400.20_gif.gif", 
+  "GIFs/scroller_002.gif",
   "GIFs/rot45_animated-greytone001_600-1800.20_gif.gif", 
+  "GIFs/scroller_001.gif",
   "GIFs/rot45_animated-greytone001_600-2500.20_jpg.gif", 
   "GIFs/rot45_animated-greytone001_600-600.20_gif.gif", 
   "GIFs/rot45_animated-greytone001_600_magenta-1500.20_gif.gif", 
+  "GIFs/scroller_002.gif",
   "GIFs/rot45_animated-greytone001_600_magenta-4400.20_jpg.gif",
+  "GIFs/scroller_001.gif",
 
 
   "GIFs/flop_animated-greytone001_600-1300.20_jpg.gif", 
   "GIFs/flop_animated-greytone001_600-1400.20_gif.gif", 
   "GIFs/flop_animated-greytone001_600-1600.20_jpg.gif", 
+  "GIFs/scroller_001.gif",
   "GIFs/flop_animated-greytone001_600-2500.20_jpg.gif", 
   "GIFs/flop_animated-greytone001_600-4000.20_gif.gif", 
   "GIFs/flop_animated-greytone001_600-900.20_jpg.gif", 
+  "GIFs/scroller_001.gif",
   "GIFs/flop_animated-greytone001_600_magenta-1500.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600_magenta-4400.20_jpg.gif"
+  "GIFs/flop_animated-greytone001_600_magenta-4400.20_jpg.gif",
 
-
+  "GIFs/scroller_002.gif",
 
 };
 
 
-// You need to watch for choking the machine 
-String[] old_gifFiles = { 
-
-  "GIFs/animated-greytone001_600-1200.20_jpg.gif", 
-  "GIFs/animated-greytone001_600-1300.20_jpg.gif", 
-  "GIFs/animated-greytone001_600-1400.20_gif.gif", 
-  "GIFs/animated-greytone001_600-1600.20_jpg.gif", 
-  "GIFs/animated-greytone001_600-1800.20_gif.gif", 
-  "GIFs/animated-greytone001_600-1800.20_jpg.gif", 
-  "GIFs/animated-greytone001_600-2500.20_jpg.gif", 
-  "GIFs/animated-greytone001_600-3100.20_gif.gif", 
-  "GIFs/animated-greytone001_600-4000.20_gif.gif", 
-  "GIFs/animated-greytone001_600-600.20_gif.gif", 
-  "GIFs/animated-greytone001_600-900.20_jpg.gif", 
-  "GIFs/animated-greytone001_600_magenta-1500.20_gif.gif", 
-  "GIFs/animated-greytone001_600_magenta-1700.20_jpg.gif", 
-  "GIFs/animated-greytone001_600_magenta-4400.20_jpg.gif",
-
-  "GIFs/rot45_animated-greytone001_600-1200.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600-1300.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600-1400.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600-1600.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600-1800.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600-1800.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600-2500.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600-3100.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600-4000.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600-600.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600-900.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600_magenta-1500.20_gif.gif", 
-  "GIFs/rot45_animated-greytone001_600_magenta-1700.20_jpg.gif", 
-  "GIFs/rot45_animated-greytone001_600_magenta-4400.20_jpg.gif",
-
-  "GIFs/flop_animated-greytone001_600-1200.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600-1300.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600-1400.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600-1600.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600-1800.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600-1800.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600-2500.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600-3100.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600-4000.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600-600.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600-900.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600_magenta-1500.20_gif.gif", 
-  "GIFs/flop_animated-greytone001_600_magenta-1700.20_jpg.gif", 
-  "GIFs/flop_animated-greytone001_600_magenta-4400.20_jpg.gif"
-
-};
 
 Gif[] gifs;
 
@@ -220,17 +179,17 @@ void keyPressed() {
 }
 
 void resetLists() {
-renderR.clear();
-renderL.clear();
- renderC.clear();
-centerScaling = 3.0;
-globalTintIndex = 0;
- gridL4x4Pointer = 15;
- gridR4x4Pointer = 0;
+  renderR.clear();
+  renderL.clear();
+  renderC.clear();
+  centerScaling = 3.0;
+  globalTintIndex = 0;
+  gridL4x4Pointer = 15;
+  gridR4x4Pointer = 0;
 
- gridCPointer = 0;
- gridCRows = 3;
- gridCCols = 3;
+  gridCPointer = 0;
+  gridCRows = 3;
+  gridCCols = 3;
 
 }
 

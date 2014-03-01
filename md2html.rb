@@ -4,36 +4,48 @@ require 'bluecloth'
 
 exit unless ARGV && ARGV.size > 0
 
-src = ARGV[0]
+src = ARGV.shift
 
-s = IO.read ARGV[0] 
+browse = if ARGV.include? '-b'
+           true
+         else
+           false
+         end
+
+
+s = IO.read src
+
 html = BlueCloth.new( s ).to_html
 tmpl = DATA.read
 page_out = "web/index.html"
 
-warn ARGV[1].to_s
 
-title = ARGV[1].to_s || src
+title =  src
 tmpl.gsub!( 'BODY', html)
 tmpl.gsub!( 'TITLE', title  )
 
 p RUBY_PLATFORM
 # Need to cross-OS this part
-if RUBY_PLATFORM =~ /w32/
-  Thread.new do
-  File.open( page_out  , "wb") { |f| f.print tmpl }
-  print `ch #{File.expand_path page_out} `
+
+if browse
+
+  if RUBY_PLATFORM =~ /w32/
+    Thread.new do
+    File.open( page_out  , "wb") { |f| f.print tmpl }
+    print `ch #{File.expand_path page_out} `
+    end
+  else
+    Thread.new do
+      File.open( page_out , "wb") { |f| f.print tmpl }
+      print `firefox #{page_out}`
+    end
   end
-else
-  Thread.new do
-    File.open( page_out , "wb") { |f| f.print tmpl }
-    print `firefox #{page_out}`
-  end
+
+  sleep 5
+
+  exit
 end
 
-sleep 5
-
-exit
 
 __END__
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
