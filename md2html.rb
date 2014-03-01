@@ -25,18 +25,18 @@ tmpl.gsub!( 'BODY', html)
 tmpl.gsub!( 'TITLE', title  )
 
 p RUBY_PLATFORM
+
+File.open( page_out  , "wb") { |f| f.print tmpl }
 # Need to cross-OS this part
 
 if browse
 
   if RUBY_PLATFORM =~ /w32/
     Thread.new do
-    File.open( page_out  , "wb") { |f| f.print tmpl }
     print `ch #{File.expand_path page_out} `
     end
   else
     Thread.new do
-      File.open( page_out , "wb") { |f| f.print tmpl }
       print `firefox #{page_out}`
     end
   end

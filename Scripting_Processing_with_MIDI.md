@@ -15,13 +15,13 @@ This means you can use a music program such as Renoise or Ableton Live to contro
 
 This article is ostensibly about writing code to drive a Processing sketch from a MIDI stream, but along the way it touches on creating a configuration class for Processing, ways to structure code for the `draw` loop, dynamically calling methods given some string, and organizing code when you are still largely experimenting.
 
-The complete source code can be found on [Neurogami's github](https://github.com/Neurogami/Scripting_Processing_with_MIDI).  Parts of it will look somewhat different from what is shown here because it kept evolving as this was written.  That's the nature of creative coding.
+The complete source code can be found on [Neurogami's GitHub](https://github.com/Neurogami/Scripting_Processing_with_MIDI).  Parts of it will look somewhat different from what is shown here because it kept evolving as this was written.  That's the nature of creative coding.
 
 ## Getting started ##
 
 I will assume you already know something about Processing and have it installed.  I also assume you have some means of sending MIDI messages.   More than one would be ideal, but is not required to play along.
 
-A version of this code was created by [Neurogami](http://neurogami.com) to drive a music video for the song [TR3](http://jamesbritt.bandcamp.com/track/tr3-beta-2).
+A version of this code was created by [Neurogami](http://neurogami.com) to drive a music video for by song by [James Britt](http://jamesbritt.com), [TR3](http://jamesbritt.bandcamp.com/track/tr3-beta-2).
 
 The idea was to take images of circa 1979 Lower Manhattan and position them in time to the music.  The images weren't still; they were run through some glitching code to generate a series of different distortions and the images were combined into videos.
 
