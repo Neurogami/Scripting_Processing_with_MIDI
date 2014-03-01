@@ -15,7 +15,7 @@ This means you can use a music program such as Renoise or Ableton Live to contro
 
 This article is ostensibly about writing code to drive a Processing sketch from a MIDI stream, but along the way it touches on creating a configuration class for Processing, ways to structure code for the `draw` loop, dynamically calling methods given some string, and organizing code when you are still largely experimenting.
 
-The complete source code can be found [[FIXME HERE]].  Parts of it will look somewhat different from what is shown here because it kept evolving as this was written.  That's the nature of creative coding.
+The complete source code can be found on [Neurogami's github](https://github.com/Neurogami/Scripting_Processing_with_MIDI).  Parts of it will look somewhat different from what is shown here because it kept evolving as this was written.  That's the nature of creative coding.
 
 ## Getting started ##
 
