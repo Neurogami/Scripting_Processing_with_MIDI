@@ -1,0 +1,7 @@
+All code, images, audio, and text is copyright 2014 James Britt / Neurogami
+
+Code is released under the MIT License: http://opensource.org/licenses/MIT
+
+Images and music are licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License: http://creativecommons.org/licenses/by-nc-sa/4.0/
+
+

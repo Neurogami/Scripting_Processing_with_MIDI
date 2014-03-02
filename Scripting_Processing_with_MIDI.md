@@ -15,25 +15,30 @@ This means you can use a music program such as Renoise or Ableton Live to contro
 
 This article is ostensibly about writing code to drive a Processing sketch from a MIDI stream, but along the way it touches on creating a configuration class for Processing, ways to structure code for the `draw` loop, dynamically calling methods given some string, and organizing code when you are still largely experimenting.
 
+As happens when writing about code, the code evolved during the writing, so in some ways it's something like a travelogue, with some minor detours and false turns on the way to the final destination.  However, all this should help in understanding the bigger picture.
+
 The complete source code can be found on [Neurogami's GitHub](https://github.com/Neurogami/Scripting_Processing_with_MIDI).  Parts of it will look somewhat different from what is shown here because it kept evolving as this was written.  That's the nature of creative coding.
+
+That repo includes the Processing code covered here, the graphics used by the sketch, and a version of a track by Neurogami, "A Temporary Lattice." 
+
 
 ## Getting started ##
 
-I will assume you already know something about Processing and have it installed.  I also assume you have some means of sending MIDI messages.   More than one would be ideal, but is not required to play along.
+I will assume you already know something about Processing and have it installed.  I also assume you have some means of sending MIDI messages.   More than one would be ideal, but is not required to play along. If you have Renoise (there's a free demo version you can grab) you can use the demo track used here.
 
-A version of this code was created by [Neurogami](http://neurogami.com) to drive a music video for by song by [James Britt](http://jamesbritt.com), [TR3](http://jamesbritt.bandcamp.com/track/tr3-beta-2).
+A version of this code was created by [Neurogami](http://neurogami.com) to drive a music video for by song by [James Britt](http://jamesbritt.com), ["TR3"](http://jamesbritt.bandcamp.com/track/tr3-beta-2).
 
 The idea was to take images of circa 1979 Lower Manhattan and position them in time to the music.  The images weren't still; they were run through some glitching code to generate a series of different distortions and the images were combined into videos.
 
-In addition to the glitched images there were animated drawings created using a different set of distortions.  These specifics are not essential to the use of MIDI, but I like the effect so I use it here.
+In addition to the glitched images there were animated drawings created using a different set of distortions.  These specifics are not essential to the use of MIDI, but the effect is good so it's used it here.
 
 ### Picking a MIDI library ###
 
-Processing, all on its own, does not know anything about MIDI. Under the hood, Processing is Java so any Java MIDI library should work well with Processing.  There are, however, some Java MIDI libraries that have been packaged for use with Processing, which can make some things easier.
+Processing, all on its own, does not know anything about MIDI. Under the hood Processing is Java so any Java MIDI library should work well with Processing.  There are, however, some Java MIDI libraries that have been packaged for use with Processing, which can make some things easier.
 
-There are two MIDI libraries for Processing that I seem to come across most often. One is [proMIDI](http://creativecomputing.cc/p5libs/promidi/), the other is [the MidiBus](http://www.smallbutdigital.com/themidibus.php).  I tried both and went with MidiBus.  I wish I culd give you some useful details as to _why_, but I honestly do not remember.  The code described here could plausibly by ported to work with other MIDI libraries so long as they support two features: The ability to connect and listen to events from mulitple MIDI devices, and callbacks that are invoked on events from any of the connected devices.
+There are two MIDI libraries for Processing that seem to come up quite often. One is [proMIDI](http://creativecomputing.cc/p5libs/promidi/), the other is [the MidiBus](http://www.smallbutdigital.com/themidibus.php).  I tried both and went with MidiBus.  I wish I could give you some useful details as to _why_, but I honestly do not remember.  The code described here could plausibly by ported to work with other MIDI libraries so long as they support two features: The ability to connect and listen to events from multiple MIDI devices, and callbacks that are invoked on events from any of the connected devices.
 
-For this article go install the MidiBus librayr if you do not already have it.
+For this article go install the MidiBus library if you do not already have it.
 
 ## A simple sketch ###
 
@@ -52,16 +57,13 @@ This is a simple sketch to show basic behavior and to check that things work.
 
     void setup() {
       size(480, 320);
-      MidiBus.list(); // List all available Midi devices on STDOUT. 
-                      // This will show each device's index and name.
+      MidiBus.list(); 
       myBus = new MidiBus(this, midiDevice, 1); 
     }
-
 
     void draw() {
       background(currentColor);
     }
-
 
     void midiMessage(MidiMessage message, long timestamp, String bus_name) { 
       int note = (int)(message.getMessage()[1] & 0xFF) ;
@@ -74,8 +76,7 @@ This is a simple sketch to show basic behavior and to check that things work.
     }
 
 
-
-First a quick run-through: When you run this you should see (either in the Processing IDE message window, or in terminal window, depending on how you run it) a list of available MIDI inputs and outputs.   In my case I've attached a QuNexus MIDI keyboard that happens to come up as input number 3, so that's the value I assigned to `midiDevice`.  (I don't care what output device is selected to I just set it to 1.)
+First a quick run-through: When you run this you should see (either in the Processing IDE message window, or in a terminal window, depending on how you run it) a list of available MIDI inputs and outputs.   In my case I've attached a QuNexus MIDI keyboard that happens to come up as input number 3, so that's the value I assigned to `midiDevice`.  (I don't care what output device is selected to I just set it to 1.)
 
 The sketch pops up a window that will change shades of gray based on the velocity of whatever MIDI not you send it.
 
@@ -114,32 +115,32 @@ So this is quite the simple sketch but demonstrates a key idea: The sketch waits
 
 ## Configuration, and getting clever ##
 
-If you write enough Processing sketches that depend on some initial settings that you need to adjust you are likely to do as I did and work some way to load such settings from a configuration file.  I suspect this is the ind of coding that falls into the "How hard can it be to do something simple?" category since I don't think I even bothered to look for an existing solution.  Instead I did something really simple and adjusted it over time.
+If you write enough Processing sketches that depend on some initial settings that you need to adjust for different executions you are likely to do as I did and work out some way to load such settings from a configuration file.  I suspect this is the kind of coding that falls into the "How hard can it be?" category since I don't think I even bothered to look for an existing solution.  Instead I did something really simple and adjusted it over time.
 
-My first `Config` class loaded a text file from the `data/` folder and  parsed `name:value` strings into a `HashMap`. It worked pretty well for most thigs.  Great for simple single-item entries, but not so good if you wanted to define a list of values.
+My first `Config` class loaded a text file from the `data/` folder and  parsed `name:value` strings into a `HashMap`. It worked pretty well for most things.  Great for simple single-item entries, but not so good if you wanted to define a list of values.
 
-I got to wondering if I could use [YAML](http://www.yaml.org/spec/1.2/spec.html) or [JSON](http://www.json.org) so that a text file could represent more complex structures.  Turns out that Processing gives you built-in JSON handling. Prefect.
+I got to wondering if I could use [YAML](http://www.yaml.org/spec/1.2/spec.html) or [JSON](http://www.json.org) so that a text file could represent more complex structures.  Turns out that Processing gives you built-in JSON handling. Perfect.
 
 For the MIDI sketch the configuration was updated to use JSON.  Loading a JSON file and getting at the values is mostly easy but not entirely transparent.  You can get at different types of data using `getInt`, `getFloat`, `getString`, etc., but if you want to grab a list of items you need `getJSONArray` and then need to pull out each item as the correct type.
 
 For this `Config` I decided that in most cases any list of items will be of the same type.  So I added `getStrings` ,`getFloats`, and `getInts`.
 
-Now instead of putting the devices idexices into my sketch I could use a config file.  JSON is not as simple as `name:value` but it's not too far off from that.   A bit overkill for short files, very handy for more complex structured data. 
+Now instead of putting the devices indices into my sketch I could use a config file.  JSON is not as simple as `name:value` but it's not too far off from that.   A bit overkill for short files, very handy for more complex structured data. 
 
 I won't get into the details on that code here.  You can read more about it [here](http://jamesbritt.com/posts/getting-configgy-with-processing.html).
 
-That first demo sketch showed one way to create a `MidiBus` object.  THere's another way, and it's not only more friendly but lends itself to better configuration.   `MidiBus` lets you specify what devices to use by name.  The name has to match on what is dsplayed in the list of available devices, so you may need to first run  `MidiBus.list`  to see what's there.
+That first demo sketch showed one way to create a `MidiBus` object.  There's another way, and it's not only more friendly but lends itself to better configuration.   `MidiBus` lets you specify what devices to use by name.  The name has to match on what is displayed in the list of available devices, so you may need to first run  `MidiBus.list`  to see what's there.
 
 Once you know the names of things the configuration file can use readable text instead of cryptic numbers.
 
-You can also pass in a name for the bus so that later, when `midiMessage` is invoked, your code can (if you like) behavior differently based on the source of the message.
+You can also pass in a name for the bus so that later, when `midiMessage` is invoked, your code can (if you like) behave differently based on the source of the message.
 
 Now the demo sketch (minus the code for `Configgy.pde`) looks like this:
 
 
     import java.lang.reflect.Method;
 
-    import themidibus.*; //Import the library
+    import themidibus.*; 
     import javax.sound.midi.MidiMessage; 
 
     Configgy config;
@@ -151,20 +152,16 @@ Now the demo sketch (minus the code for `Configgy.pde`) looks like this:
       size(480, 320);
 
       config = new Configgy("config.jsi");
-
       String[] deviceNames = config.getStrings("devices");
-
       println("Unavailable Devices");
-
       println( join(MidiBus.unavailableDevices(),  "\n"));
-
       println("-----------------------------------------------------");
 
       String[] available_inputs = MidiBus.availableInputs(); 
       for (int i = 0;i < available_inputs.length;i++) {
         for(int x=0; x < deviceNames.length; x++) {
           println("Check for device " + deviceNames[x] + " against " + available_inputs[i] );
-          if (deviceNames[x].equals(available_inputs[i] )) {
+          if (available_inputs[i].indexOf(deviceNames[x]) > -1 ) {
             println("* * * * Add device " + deviceNames[x] + " * * * * ");
             devices.add( new MidiBus(this, deviceNames[x], 1, deviceNames[x]) ); 
           }
@@ -221,7 +218,7 @@ No mention has been made of _sending_ MIDI messages from a sketch.  You can use 
 
 ## Custom message handlers ##
 
-Using `midiMessage` is OK for simple cases, such as having the sketch do something no matter what note is sent, or perhaps selecting behavior based on two or three notes, but if find your code filling up with lengthy `if/then` or `switch/case` statements you should be wary.  These kinds of structures can become hard to change or maintain.
+Using `midiMessage` is OK for simple cases, such as having the sketch do something no matter what note is sent, or perhaps selecting behavior based on two or three notes, but if find your code filling up with lengthy `if/then` or `switch/case` statements you should be wary.  These kinds of structures can become hard to maintain.
 
 What would be cleaner than a growing set of conditionals would be a way to invoke a method based on the note value.  Here's one way to do it:
 
@@ -245,7 +242,7 @@ What would be cleaner than a growing set of conditionals would be a way to invok
 
 When a MIDI message arrives, `midiMessage` pulls out the note value and velocity.  It passes those values on to `invokeNoteHandler`. That's where the fun happens.
 
-[Java reflection](http://docs.oracle.com/javase/tutorial/reflect/member/methodInvocation.html) allows code to find methods by name (using `getMethod`) and call them.   We want to pass an `int` value to some method of form `onNote<SomeNoteValue>`; to find a method you need to both the name and an array of classes describing what arguments that method takes.
+[Java reflection](http://docs.oracle.com/javase/tutorial/reflect/member/methodInvocation.html) allows code to find methods by name (using `getMethod`) and call them.   We want to pass an `int` value to some method of the form `onNote<SomeNoteValue>`; to find a method you need to both the name and an array of classes describing what arguments that method takes.
 
 Once a reference to such a method is found it is invoked using (surprise!) `invoke`.
 
@@ -271,9 +268,8 @@ First, change the type of `currentColor`:
     color currentColor = new color(0,0,0);
 
 Now have the note handlers set different colors:
-
  
-     void onNote48(int vel) {
+    void onNote48(int vel) {
        if (vel > 0 ) { currentColor = color(255, vel*2, vel*2); }
     }
 
@@ -286,7 +282,7 @@ Now have the note handlers set different colors:
     }
    
 
-The key point is that the behavior for any given note is encapsulated in its own method instead of being crammed into one growing catch-all.
+The key point is that the behavior for any given note is encapsulated in its own method instead of being crammed into one growing catch-all method.
 
 We can make things cleaner yet by putting all the note-handling methods into a separate file (e.g. `noteHandlers.pde`) so you know exactly where to look to add or change anything.
 
@@ -317,19 +313,23 @@ What we have so far is a way to listen to any number of available MIDI input dev
 
 What initially drove this code was wanting to take a song created using a DAW (in this case [Renoise](http://renoise.com)) and generate visuals that changed in time with the music.
 
-Renoise (and no doubt other audio software) can not only record MIDI notes but can be a MIDI message source of its own.  A song track can be devoted to sending MIDI notes without triggering any specific sound.  This can be used to trigger events on a Processing sketch.
+Renoise (and no doubt other audio software) can not only record MIDI notes but can itself be a MIDI message source.  A song track can be devoted to sending MIDI notes without triggering any specific sound.  This can be used to trigger events on a Processing sketch.
 
 ### Using a Renoise track to only send MIDI ###
 
 If you do not already have Renoise you can [download a demo version](http://www.renoise.com/download) for free.   The explanation here is for the current official release, version 2.8.2
 
-When you open up a Renoise song, or create a new one, you can set up a track that plays MIDI notes while not triggering any sound in the song itself.  
+When you open up a Renoise song, or create a new one, you can set up a track that plays MIDI notes while not triggering any sound in the song itself.    (The Renoise song included with the source code already has these tracks set up.)
 
-To do this, select or add a new, empty track.  Give a sensible name; I'm prone to calling such tracks "MIDI TRIGGER", all caps, so that it stands out as something special.  I also like to set the track color to either white or black, while all the actual music tracks are assorted shades of red, blue, green, and so on.  
+It is instruments in Renoise that send external MIDI, not tracks.  A track can make use of any of the instruments in the song, but it is common for tracks to be mapped to specific instruments.  This can make it easier to organize what's making what sound.  
 
-Now select an empty Instrument slot in the upper right.  Since you do not want any sound generated you need to make sure no instrument is assign to that slot. 
+Tracks are broken up into patterns, with patterns containing some number of lines; these lines hold the commands to play notes, trigger samples, and control effects.    Commands to play notes map to instruments.  Usually these instruments are there to make sounds, but there's no requirement for that.  That allows you to create a soundless MIDI-trigger track.   
 
-With that unassigned-instrument sot selected go down to the bottom and select the "Instrument Settings" tab. Click on "Ext. MIDI" and select a device.  For example, "01. Internal MIDI".  (Your choices will depend on what's available on your machine.)
+To do this, select or add a new, empty track.  Give it a sensible name; I'm prone to calling such tracks "MIDI TRIGGER", all caps, so that it stands out as something special.  I also like to set the track color to either white or black, while all the actual music tracks are assorted shades of red, blue, green, and so on.  
+
+Now select an empty `Instrument` slot in the upper right.  Since you do not want any sound generated you need to make sure no instrument is assign to that slot. 
+
+With that unassigned-instrument slot selected go down to the bottom and select the "Instrument Settings" tab. Click on "Ext. MIDI" and select a device.  For example, "01. Internal MIDI".  (Your choices will depend on what's available on your machine.)
 
 While still on that tab you can, if you like, name this "instrument"; it says "Untitled Instrument" by default but you can click on that and edit it.  Maybe call it "MIDI TRIGGER". Now you can see this name up in the instrument panel up top.
 
