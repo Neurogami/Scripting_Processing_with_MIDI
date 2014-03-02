@@ -16,6 +16,9 @@ int gridCPointer = 0;
 int gridCRows = 3;
 int gridCCols = 3;
 
+
+float CENTER_SCALNG_DEFAULT = 6.0;
+
 void clearGridC() {
   renderC.clear();  
 }
@@ -49,7 +52,7 @@ void addToGridFullC() {
  gridCRows = 3;
  gridCCols = 6;
 
- centerScaling = 1.0;
+ centerScaling = CENTER_SCALNG_DEFAULT;
  
  
 if (gridCPointer > (gridCRows*gridCCols)-1) {
@@ -139,16 +142,144 @@ void onNote52(int vel, int channel, String bus_name) {
 
 
 /* Grid note handlers */
-// To get a nicer set off effects we will pretend that the screen is larger than it
-// is we want to place an image in the middle but larger than what it would normally be
-//  Or jst add a scaling factor and play wiht number
-void onGridNote48(int vel, int channel, String bus_name) {
+/* 
+ To get a nicer set off effects we will pretend that the screen is larger than it
+ is we want to place an image in the middle but larger than what it would normally be
+  Or just add a scaling factor and play wiht number
+
+  Handlers for values 48 and above are meant for the QuNexus.
+  The others are meant for the Launchpad.
+
+         up     dn    <       >     sess    u1     u2   mixer       
+       (104)  (105)  (106)  (107)  (108)  (109)  (110)  (111)       
+                                                                    
+       [  0]  [  1]  [  2]  [  3]  [  4]  [  5]  [  6]  [  7]  (  8)
+       [ 16]  [ 17]  [ 18]  [ 19]  [ 20]  [ 21]  [ 22]  [ 23]  ( 24)
+       [ 32]  [ 33]  [ 34]  [ 35]  [ 36]  [ 37]  [ 38]  [ 39]  ( 40)
+       [ 48]  [ 49]  [ 50]  [ 51]  [ 52]  [ 53]  [ 54]  [ 55]  ( 56)
+       [ 64]  [ 65]  [ 66]  [ 67]  [ 68]  [ 69]  [ 70]  [ 71]  ( 72)
+       [ 80]  [ 81]  [ 82]  [ 83]  [ 84]  [ 85]  [ 86]  [ 87]  ( 88)
+       [ 96]  [97]   [98]   [ 99]  [100]  [101]  [102]  [103]  (104)
+       [112]  [113]  [114]  [115]  [116]  [117]  [118]  [119]  (120)
+
+
+  The idea with the Launchpad is that pads in the first 3 rows and 5 cols
+  are mapped as follows:
+
+  Center button (middle col and row) puts an image in center full scaling.
+   
+
+
+*/
+
+
+void onGridNote8(int vel, int channel, String bus_name) {
+   clearGridC();
+}
+
+
+void onGridNote104(int vel, int channel, String bus_name) {
+   increaseCenterScaling();
+}
+
+
+void onGridNote105(int vel, int channel, String bus_name) {
+   decreaseCenterScaling();
+}
+
+
+void onGridNote111(int vel, int channel, String bus_name) {
+  resetCenterScaling();
+}
+
+void onGridNote16(int vel, int channel, String bus_name) {
+   placeGif8x16(17, 6.0);
+}
+
+void onGridNote17(int vel, int channel, String bus_name) {
+   placeGif8x16(19, 6.0);
+}
+void onGridNote18(int vel, int channel, String bus_name) {
+   placeGifInCenter();
+}
+
+void onGridNote19(int vel, int channel, String bus_name) {
+   placeGif8x16(23, 6.0);
+}
+
+void onGridNote20(int vel, int channel, String bus_name) {
+   placeGif8x16(25, 6.0);
+}
+
+// Smaller
+ void onGridNote0(int vel, int channel, String bus_name) {
+   placeGif8x16(48, 2.5);
+}
+
+void onGridNote1(int vel, int channel, String bus_name) {
+   placeGif8x16(51, 2.5);
+}
+void onGridNote2(int vel, int channel, String bus_name) {
+   placeGif8x16(55, 2.5);
+}
+
+void onGridNote3(int vel, int channel, String bus_name) {
+   placeGif8x16(58, 2.5);
+}
+
+void onGridNote4(int vel, int channel, String bus_name) {
+   placeGif8x16(61, 2.5);
+}
+
+// Larger
+ void onGridNote32(int vel, int channel, String bus_name) {
+   placeGif8x16(0, 8.0);
+}
+
+void onGridNote33(int vel, int channel, String bus_name) {
+   placeGif8x16(2, 8.0);
+}
+void onGridNote34(int vel, int channel, String bus_name) {
+   placeGif8x16(4, 8.0);
+}
+
+void onGridNote35(int vel, int channel, String bus_name) {
+   placeGif8x16(6, 8.0);
+}
+
+void onGridNote36(int vel, int channel, String bus_name) {
+   placeGif8x16(8, 8.0);
+}
+
+
+
+void placeGif8x16(int index, float scaling ){
   gridCRows = 8;
   gridCCols = 16;
-
-  gridCPointer = 21;
-  centerScaling = 6.0;
+  gridCPointer = index;
+  centerScaling = scaling;
   addToGridC();
+  }
+
+void increaseCenterScaling() {
+  centerScaling += 0.2;
+}
+
+
+void decreaseCenterScaling() {
+  centerScaling -= 0.2;
+}
+
+void resetCenterScaling() {
+  centerScaling = CENTER_SCALNG_DEFAULT;
+}
+ 
+void placeGifInCenter() {  
+  placeGif8x16(21, 6.0);
+ }
+
+void onGridNote48(int vel, int channel, String bus_name) {
+placeGifInCenter();
 
 }
 
@@ -161,7 +292,7 @@ void onGridNote49(int vel, int channel, String bus_name) {
 }
 
 void onGridNote51(int vel, int channel, String bus_name) {
-  centerScaling += 0.2;
+  increaseCenterScaling();
 }
 
 void onGridNote52(int vel,  int channel, String bus_name) {

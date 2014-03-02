@@ -8,6 +8,7 @@ import gifAnimation.*;
 
 MidiBus myBus; 
 Configgy config;
+int maxImages = 1000;
 
 
 ArrayList devices = new ArrayList();
@@ -69,12 +70,13 @@ void setup() {
   String[] deviceNames = config.getStrings("devices");
   HashMap mappings = config.getHashMap("device_mappings");
   alternateGridChannel = config.getInt("alternateGridChannel_", 3);
+  maxImages = config.getInt("maximages", maxImages);
 
   println("Unavailable Devices");
   println( join(MidiBus.unavailableDevices(),  "\n"));
   println("-----------------------------------------------------");
 
-  String[] available_inputs = MidiBus.availableInputs(); //Returns an array of available input devices
+  String[] available_inputs = MidiBus.availableInputs(); 
 
   for (int i = 0;i < available_inputs.length;i++) {
     for(int x=0; x < deviceNames.length; x++) {
@@ -103,7 +105,11 @@ void setup() {
   renderR = new ArrayList<RenderArgs>();
   renderC = new ArrayList<RenderArgs>();
 
+  if (maxImages < maxGifs ) { maxGifs = maxImages; }
+
   gifs = new Gif[maxGifs];
+  
+  
   for (int i = 0; i < maxGifs; i++) {
     println("Load " + gifFiles[i] );
     gifs[i] = new Gif(this, gifFiles[i]);
