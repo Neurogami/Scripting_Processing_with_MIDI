@@ -327,19 +327,19 @@ Tracks are broken up into patterns, with patterns containing some number of line
 
 To do this, select or add a new, empty track.  Give it a sensible name; I'm prone to calling such tracks "MIDI TRIGGER", all caps, so that it stands out as something special.  I also like to set the track color to either white or black, while all the actual music tracks are assorted shades of red, blue, green, and so on.  
 
-Now select an empty `Instrument` slot in the upper right.  Since you do not want any sound generated you need to make sure no instrument is assign to that slot. 
+Now select an empty `Instrument` slot in the upper right.  Since you do not want any sound generated you need to make sure no actual instrument is assign to that slot. 
 
 With that unassigned-instrument slot selected go down to the bottom and select the "Instrument Settings" tab. Click on "Ext. MIDI" and select a device.  For example, "01. Internal MIDI".  (Your choices will depend on what's available on your machine.)
 
 While still on that tab you can, if you like, name this "instrument"; it says "Untitled Instrument" by default but you can click on that and edit it.  Maybe call it "MIDI TRIGGER". Now you can see this name up in the instrument panel up top.
 
-With that no-sound instrument selected go to your MIDI TRIGGER track and enter notes.  When you play the song these notes will be sent out on the external MIDI device you assigned the no-sound instrument.
+With that no-sound instrument selected go to your MIDI TRIGGER track and enter notes.  When you play the song these notes will be sent out on the external MIDI device you assigned to the no-sound instrument.
 
-By the way, you can assign an external MIDI device to any instrument you like and have tracks that both make sounds for the song while also sending matching notes to an external device.  For my purposes I like keeping the MIDI triggering instrument separate because I do not intend it to mirror any specific instrument and this way I can change the triggering notes without altering the sound of the song.
+By the way, you can assign an external MIDI device to any instrument you like and have tracks that both make sounds for the song while also sending those notes to an external device.  For my purposes I like keeping the MIDI triggering instrument separate because I do not intend it to mirror any specific instrument and this way I can change the triggering notes without altering the sound of the song.  
 
-The trigger notes can be any value you like (since they are not being heard).  It's useful, though, to work out some kind of naming scheme to help identify what different notes are meant to do.  In the case of the video for "TR3", one octave (starting at C4) was used to alter video images placed in assorted grid locations on the right side of the screen. Notes in another octave (at C5) altered the left side of the screen, and so on.
+The trigger notes can be any value you like (since they are not being heard).  It's useful, though, to work out some kind of naming scheme to help identify what different notes are meant to do.  For example,  one octave (starting at C4) could be was used to alter video images placed in assorted grid locations on the right side of the screen. Notes in another octave (at C5) might alter the left side of the screen, and so on.    (We'll see later on that there are other ways to organize you notes and handlers, such as using channel and MIDI device name.)
 
-You may need a chart of some kind to map note names to note values. Renoise, for example, displays notes as letters and octave; you see "C4" instead of "48".
+Depending on the complexity of your sketch you may want a chart of some kind to map note names to note values. Renoise, for example, displays notes as letters and octave; you see "C4" instead of "48".
 
 With the current state of the demo sketch you need to limit the notes to the values C4, D4, and E4 (since those are the only handlers defined so far).  As written, these handlers will show the color white when the note velocity is 100% (i.e. 127).  If you enter the notes using a velocity-sensitive keyboard (such as the handy QuNexus) then you can get a variety of velocity values below the maximum.  If you are entering them by hand (using perhaps you computer's "Z", "X", and "C" keys) you can go back and [edit the velocity](http://tutorials.renoise.com/wiki/Pattern_Editor#Sub-Note_Columns) of each note (which are, by default, the maximum).
 
@@ -349,21 +349,21 @@ Now if you configure the demo sketch to listen to the same device as the MIDI tr
 
 Let's now take all this and see if we can make it a bit more exciting.  
 
-First, an important caveat: My aesthetic may not be yours.  What I've decided to create may not be your cup of tea.  I'm a fan of (among other things) glitchy minimalism and that's the look I've gone for.  I do hope you like it, but that's not really the goal  here. 
+First, an important caveat: The Neurogami aesthetic may not be yours.  It's a kind of glitchy minimalism.  I do hope you like it, but that's not really the goal here. 
 
-The approach I've taken is to first create a number of animated GIFs made using ImageMagick and some custom Ruby software I wrote to glitch images. I then wrote code that would place, scale, etc., this or that GIF file based on what MIDI note and channel came in.
+The approach taken was to first create a number of animated GIFs made using ImageMagick and some custom Ruby software to glitch images. The Processing code then places, scales, etc., this or that GIF file based on what MIDI note and channel comes in.
 
-It's probably more common to see Process sketches where all of the visual effects are done by Processing (or some P5 library) right in the sketch.  My approach is, in way, cheating: I'm just showing pictures of graphic effects.  OK, maybe, though it makes no difference to me. It's the end result I'm concerned with.
+It's probably more common to see Process sketches where all of the visual effects are done by Processing (or some P5 library) right in the sketch.  There approach here is, in way, cheating: it's just showing pictures of graphic effects.  So what: It's the end result that matters.
 
-However, using pre-made animations does make things easier. I think getting the same visual effects in real-time in Processing would nigh impossible.  Couple that with also responding to MIDI messages in real-time make it more likely for things to go wrong.
+However, using pre-made animations does make things easier. Getting the same visual effects real-time in Processing would be nigh impossible.  Couple that with also responding to MIDI messages in real-time makes it more likely for things to go wrong.
 
-There is something about my approach that is common to most Processing sketches.  If you look at most any example that renders something visually striking the sketch generally works like this: On each pass of `draw` run some code to update a set of variables, then use the current state of those variables to determine what to render.
+There is something about this sketch that is common to most Processing sketches.  If you look at most any example that renders something visually striking the sketch generally works like this: On each pass of `draw`, run some code to update a set of variables, then use the current state of those variables to determine what to render.
 
-My sketch is the same.  It uses a very slick library called [gifAnimation](http://extrapixel.github.io/gif-animation/) to play animated GIFs.  You can use them as you would any regular image file, that is, pass a reference to an animated GIF to `image` to control the placement and scaling.
+This sketch is the same.  It uses a very slick library called [gifAnimation](http://extrapixel.github.io/gif-animation/) to play animated GIFs.  You can use them as you would any regular image file, that is, pass a reference to an animated GIF to `image` to control the placement and scaling.
 
 The thing is,  if you are looking to render numerous images in varying places, some persisting some not, you need some way to keep track of them.  If you knew the exact number of images you might be able to use a fixed set of variables to hold all the details, but past some small number that gets cumbersome.
 
-I had in mind to render the GIFs placed into grids of different sizes.   I decided to split the screen in half down the middle.  Image placement would be done by specifying  left or right, what size grid (by giving the number of rows and columns), and where in that grid to place the image.
+I had in mind to render the GIFs placed into grids of different sizes.   I decided to split the screen in half, down the middle.  Image placement would be done by specifying  left or right, what size grid (by giving the number of rows and columns), and where in that grid to place the image.
 
 Tracking a set of related data calls for some way to group them. Sometimes an array works, but in this case there needs to be two sets of grouped data.  Making your classes in Processing is easy and affords a way to keep related data together.    I defined a class called `RenderArgs` (you'll see why in a moment)
 
@@ -386,7 +386,7 @@ Tracking a set of related data calls for some way to group them. Sometimes an ar
 
     }
 
-It's just  away to group a tint color, a reference to animated GIF, the number of columns and rows in a grid, and where in that grid to place the GIF.
+It's just a way to group a tint color, a reference to an animated GIF, the number of columns and rows in a grid, and where in that grid to place the GIF.
 
 These (except for the tint) are all arguments to a method `placeGifAt`.
 
@@ -411,22 +411,21 @@ These (except for the tint) are all arguments to a method `placeGifAt`.
 
     }
 
-The file with this code also defines `RIGHT` as `1` to make this more readable.
+(The file with this code also defines `RIGHT` as `1` to make this more readable.)
 
 Plausibly, this method could be part of the same class that holds all of the argument values; the code evolved from first creating a method to define how to place an image in a grid-slot.  
 
-`renderGifAt`  gets called in `draw`, along with a call to `tint`.  All this could be wrapped up in an instance method (`render`, perhaps) in `renderArgs` (which would then need a better name) so that data and behavior are kept together (sort of the whole point of classes). I just haven't.  I'm still trying things out and I'm OK if code hasn't settled into a final form.
+`renderGifAt`  gets called in `draw`, along with a call to `tint`.  All this could be wrapped up in an instance method (`render`, perhaps) in `renderArgs` (which would then need a better name) so that data and behavior are kept together (sort of the whole point of classes). I just haven't done this.  I'm still trying things out and I'm OK if code hasn't settled into some final form.
 
-There are assorted helper methods that manage a list of animated GIF instances and a list of tints, and two `ArrayList` instances to hold onto the current set of `RenderArgs` instances.  
+There are assorted helper methods that manage a list of animated GIF instances and a list of tints, and some `ArrayList` instances to hold on to `RenderArgs` instances.  
 
-`draw` does very little. It sets a black background then iterates over the `RenderArgs` lists, and for each item calls `tint` then `image`.  In other words, it looks at a set of variables and  uses them to decide what to render.
+`draw` does very little. It sets a black background then iterates over the `RenderArgs` lists, and for each item calls `tint` then `image`.  In other words, it looks at a set of variables and uses them to decide what to render.
 
 ## What's that channel? ##
 
 Since `draw` doesn't do much the real action must be happening elsewhere.  Indeed, it's the note-handling methods that drive what is seen.    When a MIDI message comes in it gets dispatched to a matching note handler if one exists.  I decided I wanted to be able to generate some patterns, such as filling up a 4x4 grid with images note-by-note.  I wrote a note handler that did this for the left side of the sketch window, and thought it would be nice to do the same on the right side, but reversed. 
 
-At first I did this using two different note handlers, thinking I would use one octave (starting at C4) for things to happen on the left side, and another octave (at C5) for the right.  This felt awkward.  Why not get channels involved?
-
+At first I did this using two different note handlers, thinking I would use one octave for things to happen on the left side, and another octave for the right.  This felt awkward.  Why not get channels involved?
 
 `MidiBus` provides some additional event handlers, including `noteOn`, which, if you define it, gets called when any device receives a note-on message.  This method will give you the channel, the note value, and the velocity.   However, it does not give you the name of the MIDI bus that received it.
 
@@ -438,8 +437,7 @@ At this point in development I did not have a clear plan for using the bus name 
 
 A MIDI message is pretty compact.  It is sent as a series of bytes.  I'm going to skip the technical details but to get the useful value of these bytes in Java you need to grab a subsection of them and then apply a "mask".  This mask forces some part of the value to assume a certain value giving us a useful result.
 
-We've seen how this is done to get the note and velocity values.  They same approach can be used to get the channel as well.  `midiMessage` then becomes this:
-
+The code was doing this to get the note and velocity values.  They same approach can be used to get the channel as well.  `midiMessage` then becomes this:
 
     void midiMessage(MidiMessage message, long timestamp, String bus_name) {
       int channel = (int)(message.getMessage()[0] & 0x0F) + 1;
@@ -468,7 +466,7 @@ With both channel and bus name available each note handler can behavior differen
 
 I assigned this the C4 (i.e. note 48). Before bringing channels into the code I had C64 trigger this behavior on the left side of the sketch and C5 used to trigger it on the right (where it would run in reverse, starting from grid location 15).  But I wasn't happy with this use of octaves.  Deciding to add channels I created another MIDI-trigger instrument in Renoise and set it to output on channel 2.  This way I could set up each note to map to some specific behavior, with the channel determining on what side of the screen it would appear.  
 
-These kinds of organizing decisions are quite subjective.  This works for me (so far; perhaps after more use I'll work out some other scheme).  The point is no one true way to do this; find an approach that works for you.
+These kinds of organizing decisions are quite subjective.  This works for me (so far; perhaps after more use I'll work out some other scheme).  The point is that there is no one true way to do this; find an approach that works for you.
 
 Here's how `onNote48` ended up after that change:
 
@@ -487,35 +485,33 @@ Here's how `onNote48` ended up after that change:
     
 ## Yet another bus ... ##
 
-You can look at the final source code to see what I came up with for note handlers, run it with the example Renoise file, or watch the video to just see it in action.  There's a very good chance that the cde will not be exacrly what I've shown here.  As I've been desribing the sketch I've been reconsidering how things should work.  This is the nature of exploratiry coding.
+You can look at the final source code to see what I came up with for note handlers, run it with the example Renoise file, or [watch the video](http://youtu.be/M0bEJilXtJM) to just see it in action.  There's a very good chance that the code will not be exactly what I've shown here.  As I've been describing the sketch I've been reconsidering how things should work.  This is the nature of exploratory coding.
 
-While trying out this and that I realized that it can be hard to pre-plan every change and switch and jump you might want to see in the sketch.   As I would alter code or edit the MIDI tracks in Renoise and watch the results I kept thinking, hey, a sudden tint change would be good, or this would be the right beat to throw up dual full-sized images for half a bar.  In other words, there were a few  select effects I wanted but only at key moments.  
+While trying out this and that I realized that it can be hard to pre-plan every change and switch and jump you might want to see in the sketch.   As I would alter code or edit the MIDI tracks in Renoise and watch the results I kept thinking, hey, a sudden tint change would be good, or this would be the right beat to throw up dual full-sized images for half a bar.  In other words, there were a few select effects I wanted but only at key moments.  
 
 Editing this into the Renoise trigger tracks would be tricky. So much nicer to activate some things in real-time using another controller as the song plays.
 
 I had started off experimenting with my QuNexus keyboard. This device allows you shift the octave so I could have worked with a range of notes not already assigned.  But I wanted to use a controller that might be more intuitive, something other than a standard keyboard.
 
-I picked up a [Novation Launchpad](http://us.novationmusic.com/midi-controllers-digital-dj/launchpad) sometime last year.  It's a grid of touch switches.  There's no velocity control, just on/off, great for triggering samples and loops and such.  It sends MIDI notes within a preset range.  Now, I sure there's a way to change what notes are assigned to each button, but since the bus name is passed on to the MIDI note handlers in the sketch I can safely reuse the existing notes.
+I picked up a [Novation Launchpad](http://us.novationmusic.com/midi-controllers-digital-dj/launchpad) sometime last year.  It's a grid of touch-pad switches.  There's no velocity control, just on/off, great for triggering samples and loops and such.  It sends MIDI notes within a preset range.  Now, I sure there's a way to change what notes are assigned to each button, but since the bus name is passed on to the MIDI note handlers in the sketch I can safely reuse the existing notes.
 
 Another approach might be to set the Launchpad to use a specific channel.  You can decide for yourself whether selecting behavior on yet another channel or branching based on bus name better fits you mental model of what's happening.
-
-I'm showing off my code to anyone who's interested but at the end of the day I'm writing it for my own use.  This means that decisions on code flow and organization and naming are based on how I find myself actually using it, not on some abstract ideal that needs to work for all general cases.
 
 There are various places the code can switch behavior based on bus name.  One, of course, is inside any of the note-handling methods.  Another would be in `invokeNoteHandler`.   Although I've been passing the bus name on to the note handlers my ideas for how to use the Launchpad didn't feel like a good fit for the existing  note handling code. For example, if I send C48 from the Launchpad I'm might not be looking to do another variation on the 4x4 grid-fill pattern, but something quite different.  Adding a test in `onNote48` for this particular device felt clunky. Suppose I defined a different set of note handlers, specific to this device?
 
 This would save me the trouble of having to add this device-name check to every single `onNoteNN` method on the off-chance there's a note value overlap.  The downside is having a device name hard-coded in my sketch.
 
-### ... and yet nother configuration option ###
+### ... and yet another configuration option ###
 
 While I wanted to dispatch certain MIDI messages to select handlers based on bus name I did not want to hard-code the bus name.  At home I have a choice of controllers, but as I write this sentence I happen to be at [HeatSync Labs](http://www.heatsynclabs.org).  I did not bring the Launchpad; the QuNexus fit much better into my laptop bag.
 
-Rather than rely the name of a specific controller in the code I added another configuration option to allow mapping device names to some other text.
+Rather than rely on the name of a specific controller in the code I added another configuration option to allow mapping device names to some other text.
 
 The `config.jsi`  entry looks like this:  
 
     device_mappings: {"Launchpad": "grid", "QuNexus": "grid" }
 
-In sketch the code that sets up devices now also looks to see id there is a device mapping for a found device, and if so then it uses that mapping name as the bus name rather than then given device name.
+In sketch the code that sets up devices now also looks to see if there is a device mapping for a found device, and if so then it uses that mapping name as the bus name rather than then given device name.
 
 This required yet another change to [Configgy.pde](http://neurogami.com/blog/neurogami-conffigy-evolution.html).  What's new is that you can store a `name:{<hashmap>}` setting and get back a `HashMap` of name/value string pairs.
 
@@ -523,7 +519,7 @@ So the sketch grabs these device name mappings ...
 
     HashMap mappings = config.getHashMap("device_mappings");
 
-... then later ...
+... and then later ...
 
     if (mappings.containsKey( deviceNames[x] ) ) {
       println("+ + + + Add device using mapping " + mappings.get( deviceNames[x]) );
