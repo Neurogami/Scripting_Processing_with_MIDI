@@ -21,6 +21,13 @@ The complete source code can be found on [Neurogami's GitHub](https://github.com
 
 That repo includes the Processing code covered here, the graphics used by the sketch, and a version of a track by Neurogami, "A Temporary Lattice." 
 
+Here's a video of what it looks like when all is assembled:
+
+
+<iframe width="560" height="290" src="http://www.youtube.com/embed/M0bEJilXtJM" frameborder="0" allowfullscreen></iframe>
+
+** A Temporary Lattice (beta v1) **
+
 
 ## Getting started ##
 
@@ -325,6 +332,12 @@ It is instruments in Renoise that send external MIDI, not tracks.  A track can m
 
 Tracks are broken up into patterns, with patterns containing some number of lines; these lines hold the commands to play notes, trigger samples, and control effects.    Commands to play notes map to instruments.  Usually these instruments are there to make sounds, but there's no requirement for that.  That allows you to create a soundless MIDI-trigger track.   
 
+
+<iframe width="480" height="290" src="http://www.youtube.com/embed/359K7qNY0Xc" frameborder="0" allowfullscreen="true"></iframe> 
+
+**Using Renoise MIDI to trigger external applications**
+
+
 To do this, select or add a new, empty track.  Give it a sensible name; I'm prone to calling such tracks "MIDI TRIGGER", all caps, so that it stands out as something special.  I also like to set the track color to either white or black, while all the actual music tracks are assorted shades of red, blue, green, and so on.  
 
 Now select an empty `Instrument` slot in the upper right.  Since you do not want any sound generated you need to make sure no actual instrument is assign to that slot. 
@@ -482,7 +495,26 @@ Here's how `onNote48` ended up after that change:
         }
       }
     }
-    
+
+
+`addToGridL4x4()` is this:
+
+
+    void addToGridL4x4() {
+
+      if (gridL4x4Pointer < 0) {
+        renderL.clear();  
+        gridL4x4Pointer = 15;
+      }
+
+      renderL.add(new RenderArgs( nextTint(),  gifs[nextGifIndex()], 4, 4, gridL4x4Pointer) );
+      gridL4x4Pointer--;
+    }
+
+The general scheme is the use of a variable to track an index into a grid, updating the index, and making sure it always has a valid value.
+
+At some point the global variables need to go away and all this wrapped up into a class, but the loose mutability lends itself to interesting behavior.
+
 ## Yet another bus ... ##
 
 You can look at the final source code to see what I came up with for note handlers, run it with the example Renoise file, or [watch the video](http://youtu.be/M0bEJilXtJM) to just see it in action.  There's a very good chance that the code will not be exactly what I've shown here.  As I've been describing the sketch I've been reconsidering how things should work.  This is the nature of exploratory coding.
@@ -567,13 +599,84 @@ The bulk of the graphics happens on a split screen.  One more rendering structur
 
 A few more tweaks get introduced as well. The option to set a scaling factor when rendering a GIF. This allows two interesting features: You can center a large GIF that would not otherwise fit int a uniform grid (since you can place it near the upper left and then scale it), and you can grow/shrink GIFs as they are show.
 
-The default MIDI mapping for the legacy Launchpad is described [here](http://www.audionewsroom.net/2010_01_01_archive.html). You'll note that some notes seem to get lost as you move across and go row-to-row.
+The default MIDI mapping for the legacy Launchpad looks like this remarkably sophisticated chart:
 
-I wanted to relate pad position to some aspect of an effect to make it more intuitive.  
 
-    [[ FIXME NEED TO FLESH THIS OUT ]]
 
-## Wrapping up ##
+       (104)  (105)  (106)  (107)  (108)  (109)  (110)  (111)
+       [  0]  [  1]  [  2]  [  3]  [  4]  [  5]  [  6]  [  7]  (  8) 
+       [ 16]  [ 17]  [ 18]  [ 19]  [ 20]  [ 21]  [ 22]  [ 23]  ( 24)
+       [ 32]  [ 33]  [ 34]  [ 35]  [ 36]  [ 37]  [ 38]  [ 39]  ( 40)
+       [ 48]  [ 49]  [ 50]  [ 51]  [ 52]  [ 53]  [ 54]  [ 55]  ( 56)
+       [ 64]  [ 65]  [ 66]  [ 67]  [ 68]  [ 69]  [ 70]  [ 71]  ( 72)
+       [ 80]  [ 81]  [ 82]  [ 83]  [ 84]  [ 85]  [ 86]  [ 87]  ( 88) 
+       [ 96]  [97]   [98]   [ 99]  [100]  [101]  [102]  [103]  (104)
+       [112]  [113]  [114]  [115]  [116]  [117]  [118]  [119]  (120)
+
+There are circular buttons across the top and along the right side; the main layout is an 8x8 grid. The numbers in that chart are the MIDI note values each button sends by default.
+
+Some things to note: There are gaps in the note ranges.  Note value 104 is repeated twice, first at top as the first button and again on a button on the lower right.
+
+
+I wanted to relate pad position to some aspect of an effect to make it more intuitive.  As you might have guessed by now it's in constant flux, but here's some examples.
+
+The Renoise track was set up to send some fairly structured sketch triggers. For example, generating a grid-filling sequence.
+
+For the `onGridNoteNN` messages I wanted to be able to place and scale GIFs across the full sketch window.
+
+As before, there's a list to hold data for placing GIFs on the screen and methods add items and clear the list.  
+
+The focus is on section of the Launchpad: the first five columns (from the left) and the top three rows.
+
+Moving across the pads in a row places a GIF in a relative screen location (far left, kinda left, center, etc.).  Moving from the first row to the third sets different GIF scaling; lower is larger.
+
+Hitting the pad for note 32 places a GIF that fills the entire left side; note 36 fills the right side.
+
+All of this works off a grid 8 rows by 16 columns.  The difference is in the scaling factor used.  Adding a GIF to the `remderC` `RenderArgs` list involves calling this method:
+
+
+    void placeGif8x16(int index, float scaling ){
+      gridCRows = 8;
+      gridCCols = 16;
+      gridCPointer = index;
+      centerScaling = scaling;
+      addToGridC();
+    }
+
+where `addToGridC` is much like `addToGridL4x4`.
+
+And, much like earlier code, there's use of assorted global variables controlling grid indexing and scaling.  
+
+#### Warning: May cause side-effects ####
+
+A great deal of Processing code I see makes copious use of global variables.  That is, variables that can be acessed and possibly altered for any place in the sketch.
+
+Generally such things make me cringe.  But why? And if it's so cringe-inducing why am I doing it here?
+
+There's is some god coverage of the perils of globla variables [here](http://c2.com/cgi/wiki?GlobalVariablesAreBad) and [here](http://programmers.stackexchange.com/questions/148108/why-is-global-state-so-evil).
+
+In a nutshell, global variables are just that: globally variable.  When a method, such as `placeGifAt` uses  a global variable (e.g. `centerScaling`) there's no assurance what value that variable may have.
+
+The value may have been set by one method, but then later changed by another, before `placeGifAt` gets to use it.  This high degree of mutability makes it very hard to understand what is going to happen when `placeGifAt` is called.  Indeed, it's quite possible that `centerScaling` may end up with a completely unusable value.  When something does not behave correctly, where do you look to understand why? If a value used in a method could be changed from anyplace in your code, how do you control it?  
+
+Many Processing sketches are quite small.  They fit into one file, and are for the most part easy to look through.  If a sketch is not terribly complicated then tracking down odd behavior is maybe not a big problem.
+
+Starting off a small program using global variables is not a major sin, and can make it easier to jump in, try stuff, and judge the results.  This kind of exploration should be encouraged.
+
+As code grows, though, the downside of side-effects resulting from global variables changing in ways that conflict with intended behavior can grow. It can make sense to start encapsulating these variables, and the ways they can be accessed, into classes.
+
+In the case of exploratory code, and perhaps creative coding in general, these side-effects can be an accidental blessing.
+
+As I wrote the handles to react to Launchpad messages I added methods that populated a list of GIF-placement information. The actual placing of these GIFs uses the common global value of `centerScaling`.
+
+Without realizing the consequences I had my methods change the value of `centerScaling`.  The unintended result was that all existing GIFs in `renderC` were changing size whenever a method altered the value of `centerScaling`.
+
+Not what I was planning, but I like the effect.  If and when I corral the code into a less haphazard structure this kind of behavior may be something I'll want to keep.
+
+
+ [[LINK TO VIDEO OF USING LAUNCHPAD ]]
+
+  ## Wrapping up ##
 
 I'm happy with what I've done so far.  I'm happy, too, to keep playing around and changing things.
 

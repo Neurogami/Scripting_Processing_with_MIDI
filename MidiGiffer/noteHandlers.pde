@@ -197,10 +197,10 @@ void launchPadGreenLight(int channel, int note ) {
   delay(10);
   launchpadOut.sendNoteOff(channel, note, 0); 
 }
+
+
 void onGridNote8(int vel, int channel, String bus_name) {
   clearGridC();
- 
-
 }
 
 
