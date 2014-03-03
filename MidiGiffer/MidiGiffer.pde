@@ -11,6 +11,8 @@ Configgy config;
 int maxImages = 1000;
 
 
+MidiBus launchpadOut;
+
 ArrayList devices = new ArrayList();
 
 int alternateGridChannel;
@@ -87,13 +89,24 @@ void setup() {
 
         if (mappings.containsKey( deviceNames[x] ) ) {
           println("+ + + + Add device using mapping " + mappings.get( deviceNames[x]) );
-          devices.add( new MidiBus(this, available_inputs[i], 1, (String) mappings.get( deviceNames[x]) ) ); 
+            launchpadOut =  new MidiBus(this, available_inputs[i], available_inputs[i], (String) mappings.get( deviceNames[x]) );
+          devices.add(launchpadOut); 
+
         } else {
           devices.add( new MidiBus(this, available_inputs[i], 1, deviceNames[x]) ); 
         }
       }
     }
   }
+
+/*    String[] available_outputs = MidiBus.availableInputs(); 
+
+    for (int i = 0;i < available_outputs.length;i++) {
+      if (available_outputs[i].indexOf("Launchpad") > -1 ) {
+         devices.add( new MidiBus(this, available_outputs[i], 2, "Launchpad" ) ); 
+      }
+    }
+*/
 
   if (devices.size() < 1 ) {
     println("Failed to assign any of the desired devices.\nExiting.");
@@ -144,18 +157,15 @@ void draw() {
 
 }
 
-
-
 void midiMessage(MidiMessage message, long timestamp, String bus_name) {
   int channel = (int)(message.getMessage()[0] & 0x0F) + 1;
-  int note = (int)(message.getMessage()[1] & 0xFF) ;
+  int note = (int)(message.getMessage()[1] & 0xFF);
   int vel = (int)(message.getMessage()[2] & 0xFF);
   if (vel > 0 ) {
     println("Bus " + bus_name + ": Note "+ note + ", vel " + vel + " : channel = "  + channel);
   }
   invokeNoteHandler(note, vel, channel, bus_name);
 }
-
 
 void invokeNoteHandler(int note, int velocity, int channel, String bus_name) {
   try {
@@ -166,6 +176,14 @@ void invokeNoteHandler(int note, int velocity, int channel, String bus_name) {
 
     if (bus_name.equals("grid") || channel == alternateGridChannel ) {
       println(" ########################### GRID MESSAGE ####################################### ");
+      println(" ########################### note " + note + ", velocity " + velocity + ", channel " + channel + ", bus_name " + bus_name + " ###########################  ");      
+      // Devices *should* be sending their channel number useing 1-based indexing, but
+      // MidiBus uses 0-based.  When gettng gettng messages from Renoise, for example, the lowest
+      // channel is 1. That's not what what comes in to `midiMessage`. A ch1 from Renoise arrives as
+      // ch0. So `midiMessage` adds 1  .
+      // But when sendng out to something like the Launchpad is seems the indexing has to start with 0. 
+      // So here we remove that added 1
+      launchPadGreenLight(channel-1, note );
       Method handler = this.getClass().getMethod( "onGridNote" + note, cls );
       handler.invoke(this, velocity, channel, bus_name);
     } else { 

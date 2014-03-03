@@ -170,11 +170,37 @@ void onNote52(int vel, int channel, String bus_name) {
    
 
 
+The following tables of pre-calculated velocity values for normal use may also be helpful: 
+Hex   Decimal   Colour  Brightness 
+ 0Ch  12        Off     Off 
+ 0Dh  13        Red     Low 
+ 0Fh  15        Red     Full 
+ 1Dh  29        Amber   Low 
+ 3Fh  63        Amber   Full 
+ 3Eh  62        Yellow  Full 
+ 1Ch  28        Green   Low 
+ 3Ch  60        Green   Full 
+
+Values for flashing LEDs are: 
+Hex  Decimal    Colour  Brightness 
+ 0Bh  11        Red     Full 
+ 3Bh  59        Amber   Full 
+ 3Ah  58        Yellow  Full 
+ 38h  56        Green  Full 
+  
+
 */
 
-
+void launchPadGreenLight(int channel, int note ) {
+  println("Light up LP for ch " + channel + " and note " + note);
+  launchpadOut.sendNoteOn(channel, note, 60); 
+  delay(10);
+  launchpadOut.sendNoteOff(channel, note, 0); 
+}
 void onGridNote8(int vel, int channel, String bus_name) {
-   clearGridC();
+  clearGridC();
+ 
+
 }
 
 
